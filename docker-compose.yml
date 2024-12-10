@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  api:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./backend
+    container_name: django-backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - celery
+
+  client:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./frontend
+    container_name: react-frontend
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - 6379:6379
+
+  celery:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./backend
+    container_name: celery-worker
+    command: celery -A config worker --loglevel=info
+    depends_on:
+      - redis
+    volumes:
+      - ./backend:/app
+
+  celery-beat:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./backend
+    container_name: celery-beat
+    command: celery -A config beat --loglevel=info
+    depends_on:
+      - redis
+    volumes:
+      - ./backend:/app
