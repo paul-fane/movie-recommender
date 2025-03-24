@@ -43,10 +43,10 @@ tzdata==2024.1
 vine==5.1.0
 wcwidth==0.2.13
 
-# boto3==1.37.13
-# attrs==25.3.0
+boto3==1.37.13
+attrs==25.3.0
 
-# gunicorn==23.0.0
+gunicorn==23.0.0
 # sentry-sdk==2.22.0
 
 # requests==2.32.3

@@ -2,10 +2,12 @@ from config.env import env
 
 from .base import *  # noqa
 
+# GENERAL
+# ------------------------------------------------------------------------------
 DEBUG = env.bool("DJANGO_DEBUG", default=False)
-
+# https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env("SECRET_KEY")
-
+# https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
 CORS_ALLOW_ALL_ORIGINS = False

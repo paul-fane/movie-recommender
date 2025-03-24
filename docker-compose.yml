@@ -18,7 +18,7 @@ services:
 
   react:
     build:
-      dockerfile: local.Dockerfile
+      dockerfile: docker/local.Dockerfile
       context: ./frontend
     container_name: react-frontend
     volumes:

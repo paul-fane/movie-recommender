@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 
-from config.env import APPS_DIR, BASE_DIR, env
+from config.env import APPS_DIR, BASE_DIR, DATA_DIR, env
 
 env.read_env(os.path.join(BASE_DIR, ".env"))
 
@@ -37,6 +37,18 @@ LOCAL_APPS = [
     "movie_recommendation_engine.common",
     "movie_recommendation_engine.tasks",
     "movie_recommendation_engine.core",
+    "movie_recommendation_engine.files",
+    "movie_recommendation_engine.integrations",
+    "movie_recommendation_engine.watchlists",
+    "movie_recommendation_engine.videos",
+    "movie_recommendation_engine.tags",
+    "movie_recommendation_engine.suggestions",
+    "movie_recommendation_engine.ratings",
+    "movie_recommendation_engine.playlists",
+    "movie_recommendation_engine.categories",
+    "movie_recommendation_engine.ml",
+    "movie_recommendation_engine.exports",
+    "movie_recommendation_engine.dashboard",
 ]
 
 THIRD_PARTY_APPS = [
@@ -56,7 +68,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
+    #'django.contrib.sites',
     *THIRD_PARTY_APPS,
     *LOCAL_APPS,
 ]
@@ -71,6 +83,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+#SITE_ID = 1
 
 ROOT_URLCONF = 'config.urls'
 
@@ -139,7 +153,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = "/static/"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 REST_FRAMEWORK = {
@@ -165,6 +182,7 @@ from config.settings.cors import *  # noqa
 
 from config.settings.debug_toolbar.settings import *  # noqa
 from config.settings.debug_toolbar.setup import DebugToolbarSetup  # noqa
+from config.settings.files_and_storages import *  # noqa
 
 INSTALLED_APPS, MIDDLEWARE = DebugToolbarSetup.do_settings(INSTALLED_APPS, MIDDLEWARE)
 

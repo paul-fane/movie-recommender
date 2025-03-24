@@ -2,6 +2,8 @@
 local-cdn
 data/
 
+__pycache__/
+
 # Django #
 *.log
 *.pot
