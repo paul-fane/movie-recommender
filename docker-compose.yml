@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  django:
+    build:
+      dockerfile: docker/local.Dockerfile
+      context: .
+    container_name: django-backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - celery
+    restart: on-failure
+
+  react:
+    build:
+      dockerfile: local.Dockerfile
+      context: ./frontend
+    container_name: react-frontend
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - 6379:6379
+
+  celery:
+    build:
+      dockerfile: docker/local.Dockerfile
+      context: .
+    container_name: celery-worker
+    command: celery -A movie_recommendation_engine.tasks worker --loglevel=info
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
+    restart: on-failure
+
+  celery-beat:
+    build:
+      dockerfile: docker/local.Dockerfile
+      context: .
+    container_name: celery-beat
+    command: celery -A movie_recommendation_engine.tasks beat --loglevel=info
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
+    restart: on-failure
