@@ -1,6 +1,6 @@
+import os
 import csv
 import datetime
-
 from pprint import pprint
 from django.conf import settings
 
@@ -10,8 +10,9 @@ from movie_recommendation_engine.categories.models import Category
 from movie_recommendation_engine.videos.models import Video
 from faker import Faker
 
-MOVIE_METADATA_CSV = settings.DATA_DIR / "movies_metadata.csv"
-YT_MOVIE_TRAILER_CSV = settings.DATA_DIR / "ml-youtube.csv"
+
+MOVIE_METADATA_CSV = os.path.join(settings.DATA_DIR, "movies_metadata.csv")
+YT_MOVIE_TRAILER_CSV = os.path.join(settings.DATA_DIR, "ml-youtube.csv")
 
 def validate_date_str(date_text):
     try:

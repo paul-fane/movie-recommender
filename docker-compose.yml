@@ -5,7 +5,7 @@ services:
     build:
       dockerfile: docker/local.Dockerfile
       context: .
-    container_name: django-backend
+    container_name: django
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
@@ -14,13 +14,13 @@ services:
     depends_on:
       - redis
       - celery
-    restart: on-failure
+    #restart: on-failure
 
   react:
     build:
-      dockerfile: docker/local.Dockerfile
+      dockerfile: local.Dockerfile
       context: ./frontend
-    container_name: react-frontend
+    container_name: react-app
     volumes:
       - /app/node_modules
       - ./frontend:/app
@@ -36,22 +36,22 @@ services:
     build:
       dockerfile: docker/local.Dockerfile
       context: .
-    container_name: celery-worker
+    container_name: celery
     command: celery -A movie_recommendation_engine.tasks worker --loglevel=info
     depends_on:
       - redis
     volumes:
       - .:/app
-    restart: on-failure
+    #restart: on-failure
 
-  celery-beat:
+  beats:
     build:
       dockerfile: docker/local.Dockerfile
       context: .
-    container_name: celery-beat
+    container_name: beat
     command: celery -A movie_recommendation_engine.tasks beat --loglevel=info
     depends_on:
       - redis
     volumes:
       - .:/app
-    restart: on-failure
+    #restart: on-failure

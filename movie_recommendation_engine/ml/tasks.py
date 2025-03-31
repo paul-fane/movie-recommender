@@ -2,8 +2,10 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from celery import shared_task
 from movie_recommendation_engine.playlists.models import MovieProxy
-from movie_recommendation_engine.users import utils as users_utils
+from movie_recommendation_engine.users.selectors import get_recent_users 
 from movie_recommendation_engine.ml import utils as ml_utils
+from movie_recommendation_engine.exports.selectors import load_model
+from movie_recommendation_engine.suggestions.services import generate_suggestions
 
 @shared_task
 def train_surprise_model_task(n_epochs=20):
@@ -30,61 +32,14 @@ def batch_users_prediction_task(users_ids=None, start_page=0, offset=50, max_pag
     
     # The model fit the trainset=>(data.buid_full_trainset())
     # The model get the accuracy using rmse algorithm passing the predictions => model.test(trainset.build_testset())
-    model = ml_utils.load_model()
-    
-    Suggestion = apps.get_model('suggestions', 'Suggestion')
-    ctype = ContentType.objects.get_for_model(MovieProxy, for_concrete_model=False)
+    model = load_model() # load the lattest mode
     
     
     # Fetching Movies and Users
     end_page = start_page + offset
-    # If users_ids is not provided, the function fetches recent users
-    if users_ids is None:
-        users_ids = users_utils.get_recent_users()
-        
-    # Retrieves popular movie IDs in the range [start_page:end_page].
-    # The "start_page" is the number of alredy existing suggestions for those movies
-    movie_ids = MovieProxy.objects.all().popular().values_list('id', flat=True)[start_page:end_page]
     
-    # Fetches movies that have already been suggested to the users to avoid duplicate recommendations.
-    recently_suggested = Suggestion.objects.get_recently_suggested(movie_ids, users_ids)
-    new_suggestion = []
-    if not movie_ids.exists():
-        return 
+    generate_suggestions(model, users_ids, start_page, end_page)
     
-    # The function iterates over the movies and users
-    # Skips users who already have suggestions for the movie or if the user/movie data is invalid.
-    for movie_id in movie_ids:
-        users_done = recently_suggested.get(f"{movie_id}") or []
-        for u in users_ids:
-            if u in users_done:
-                # print(movie_id, 'is done for', u, 'user')
-                continue
-            if u is None:
-                continue
-            if movie_id is None:
-                continue
-            # The model predicts the estimated rating (pred) for a user (uid) and a movie (iid).
-            # est is the predicted rating value.
-            pred = model.predict(uid=u, iid=movie_id).est
-            data = {
-                'user_id': u,
-                'object_id': movie_id,
-                'value': pred,
-                'content_type': ctype
-            }
-            try:
-                obj, _ = Suggestion.objects.get_or_create(user_id=u, object_id=movie_id, content_type=ctype)
-            except Suggestion.MultipleObjectsReturned:
-                # If duplicate Suggestion objects are found, they are deleted
-                qs = Suggestion.objects.filter(user_id=u, object_id=movie_id, content_type=ctype)
-                obj = qs.first()
-                to_delete = qs.exclude(id=obj.id)
-                to_delete.delete()
-            # Updates the predicted rating if it has changed
-            if obj.value != pred:
-                obj.value = pred
-                obj.save()
                 
     # Continues to the next batch of movies if the maximum number of pages (max_pages) hasn't been reached.
     if end_page < max_pages:

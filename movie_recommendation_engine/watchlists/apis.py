@@ -42,7 +42,7 @@ class WatchlistCreateView(APIView):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
-        watchlist_create(data=serializer.validated_data, user=request.user, request=request)
+        watchlist_create(data=serializer.validated_data, user=request.user)
         return Response(status=status.HTTP_201_CREATED)
         
         

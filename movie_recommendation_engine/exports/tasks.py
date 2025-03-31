@@ -1,12 +1,16 @@
 from celery import shared_task
 
-
-from movie_recommendation_engine.exports import utils as export_utils
+from movie_recommendation_engine.exports.services import export_dataset
+from movie_recommendation_engine.exports.models import ExportDataType
+from movie_recommendation_engine.ratings.selectors import ratings_dataset
+from movie_recommendation_engine.playlists.selectors import movies_dataset
 
 @shared_task(name='export_rating_dataset')
 def export_rating_dataset_task():
-    export_utils.generate_rating_dataset(to_csv=True)
+    dataset = ratings_dataset()
+    export_dataset(dataset=dataset, fname='ratings.csv', type=ExportDataType.RATINGS)
 
 @shared_task(name='export_movies_dataset')
 def export_movies_dataset_task():
-    export_utils.generate_movies_dataset(to_csv=True)
+    dataset = movies_dataset()
+    export_dataset(dataset=dataset, fname='movies.csv', type=ExportDataType.MOVIES)

@@ -7,9 +7,10 @@ import datetime
 from django.utils.text import slugify
 # Create your models here.
 from movie_recommendation_engine.common.models import PublishStateOptions
-from movie_recommendation_engine.common.receivers import publish_state_pre_save, unique_slugify_pre_save
+from movie_recommendation_engine.common.receivers import unique_slugify_pre_save
+from movie_recommendation_engine.playlists.receivers import publish_state_pre_save
 
-#from movie_recommendation_engine.categories.models import Category
+from movie_recommendation_engine.categories.models import Category
 from movie_recommendation_engine.ratings.models import Rating
 from movie_recommendation_engine.tags.models import TaggedItem
 from movie_recommendation_engine.videos.models import Video
@@ -126,7 +127,7 @@ class Playlist(models.Model):
     video = models.ForeignKey(Video, related_name='playlist_featured', blank=True, null=True, on_delete=models.SET_NULL) # ONE VIDEO => For  Movie(Movie) | TVshow(Trailer) | Season(Trailer)
     videos = models.ManyToManyField(Video, related_name='playlist_item', blank=True, through='PlaylistItem') # LIST OF VIDEO => for Season(episodes) | Playlist(videos)
     
-    #category = models.ManyToManyField(Category, related_name='playlists', blank=True)
+    category = models.ManyToManyField(Category, related_name='playlists', blank=True)
     tags = GenericRelation(TaggedItem, related_query_name='playlist')
     order = models.IntegerField(default=1)
     title = models.CharField(max_length=220)

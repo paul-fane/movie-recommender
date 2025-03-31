@@ -1,7 +1,9 @@
 from django.contrib.contenttypes.models import ContentType
 from movie_recommendation_engine.playlists.models import MovieProxy, TVShowProxy, Playlist
 from movie_recommendation_engine.watchlists.models import Watchlist
-def watchlist_create(data, user, request):
+
+
+def watchlist_create(data, user):
     object_id = data['object_id']
     ctype = data['ctype']
     

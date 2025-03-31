@@ -1,11 +1,14 @@
-from django.db.models import Subquery, OuterRef, Exists
+import datetime
+from django.utils import timezone
+from django.db.models import Subquery, OuterRef, Exists, F
+from django.db.models.query import QuerySet
 from django.contrib.contenttypes.models import ContentType
 from movie_recommendation_engine.suggestions.models import Suggestion
 from movie_recommendation_engine.playlists.models import Playlist, MovieProxy, TVShowProxy #type=Playlist.PlaylistTypeChoices.PLAYLIST
 from movie_recommendation_engine.ratings.models import Rating
 from movie_recommendation_engine.watchlists.models import Watchlist
 
-def suggestions_list(user, filters=None):
+def suggestions_list(user, filters=None) -> QuerySet[Suggestion]:
     filters = filters or {}
     
     category = filters['category']
@@ -53,3 +56,28 @@ def suggestions_list(user, filters=None):
         )
     
     return playlist_qs
+
+
+def get_recently_suggested(movie_ids=[], user_ids=[], days_ago=7):
+    data = {}
+    delta = datetime.timedelta(days=days_ago)
+    time_delta = timezone.now() - delta
+    ctype = ContentType.objects.get_for_model(MovieProxy, for_concrete_model=False)
+    filter_args = {
+        "content_type": ctype,
+        "object_id__in": movie_ids,
+        "user_id__in": user_ids,
+        "active": True,
+        "timestamp__gte": time_delta
+    }
+    dataset = Suggestion.objects.filter(**filter_args)
+    dataset = dataset.annotate(movieId=F('object_id'), userId=F('user_id')).values("movieId", "userId")
+    for d in dataset:
+        # print(d) # [{'movieId': abac, 'userId': ad}]
+        movie_id = str(d.get("movieId"))
+        user_id = d.get('userId')
+        if movie_id in data:
+            data[movie_id].append(user_id)
+        else:
+            data[movie_id] = [user_id]
+    return data

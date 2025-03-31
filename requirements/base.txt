@@ -18,9 +18,9 @@ django-storages==1.14.5
 python-decouple
 redis
 
-#scikit-surprise
+scikit-surprise
 jupyter
-numpy
+numpy==1.26.4
 pandas
 
 

@@ -4,7 +4,8 @@ from movie_recommendation_engine.playlists.models import Playlist, MovieProxy, T
 #from watchlists.models import Watchlist
 from movie_recommendation_engine.ratings.models import Rating
 from movie_recommendation_engine.watchlists.models import Watchlist
-
+from django.db.models.query import QuerySet
+from django.db.models import F
 # def dashboard_movie_list(user, filters=None):
 #     '''
 #     "popular": "popular",
@@ -104,3 +105,11 @@ def dashboard_movie_list(user, filters=None):
         )
 
     return qs
+
+
+
+def movies_dataset() -> QuerySet[MovieProxy]:
+    '''Retrieves movies and formats them for further processing.'''
+    qs = MovieProxy.objects.all()
+    qs = qs.annotate(movieId=F('id'), movieIdx=F("idx"))
+    return qs.values('movieIdx', 'movieId', 'title', 'release_date', 'rating_count', 'rating_avg')
