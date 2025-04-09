@@ -3,7 +3,7 @@
 A full-stack, web-based platform for discovering, rating, and reviewing movies, TV shows, and playlists. Built with **collaborative filtering** to deliver personalized recommendations based on user ratings.
 
 ---
-
+### **Video Demo**: https://www.youtube.com/watch?v=YlSKIw6bYkY
 ## **🚀 Features**
 
 ### **👤 User Experience**
