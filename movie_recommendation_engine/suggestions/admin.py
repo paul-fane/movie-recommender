@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 from django.contrib import admin
 
-from .models import Suggestion 
+from movie_recommendation_engine.suggestions.models import Suggestion 
 
 class SuggestionAdmin(admin.ModelAdmin):
     list_display = ['content_object', 'object_id', 'user', 'value']

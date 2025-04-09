@@ -7,25 +7,30 @@ from movie_recommendation_engine.users.selectors import get_recent_users
 
 
 def generate_suggestions(model, users_ids, start_page, end_page):
+    '''
+    Generate suggestions in batch(start_page:end_page) for the list of users.
+    If the users_ids is not provided, the function fetches recent users.
+    The suggestions are generated using the model provided.
+    '''
     
     #Suggestion = apps.get_model('suggestions', 'Suggestion')
     ctype = ContentType.objects.get_for_model(MovieProxy, for_concrete_model=False)
     
     
     # Fetching Movies and Users
-    # If users_ids is not provided, the function fetches recent users
     
+    # If users_ids is not provided, the function fetches recent users
     if users_ids is None:
         users_ids = get_recent_users()
         
     # Retrieves popular movie IDs in the range [start_page:end_page].
-    # The "start_page" is the number of alredy existing suggestions for those movies (starting from 0, adding the offset)
-    movie_ids = MovieProxy.objects.all().popular().values_list('id', flat=True)[start_page:end_page]
+    # The "start_page" is the number of alredy existing suggestions for those movies generated in the previous batch.
+    # The "end_page" is the "start_page" + the number of suggestions to be generated in this batch
+    movie_ids = MovieProxy.objects.all().popular().exclude(score=None).values_list('id', flat=True)[start_page:end_page]
     
     # Fetches movies that have already been suggested to the users to avoid duplicate recommendations.
     recently_suggested = get_recently_suggested(movie_ids, users_ids)
     
-    new_suggestion = []
     if not movie_ids.exists():
         return 
     

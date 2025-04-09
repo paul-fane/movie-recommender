@@ -280,7 +280,7 @@ const PlaylistDetailPage = () => {
             {playlist.release_date && `(${playlist.release_date})`}
           </Typography>
 
-          {playlist.video !== null && (
+          {/* {playlist.video !== null && (
             <iframe
               width="560"
               height="315"
@@ -290,6 +290,20 @@ const PlaylistDetailPage = () => {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               //allowfullscreen
             ></iframe>
+          )} */}
+
+          {playlist.video !== null && (
+            <div className="container">
+              <iframe
+                // width="100%"
+                // height="1080"
+                src={`https://www.youtube.com/embed/${playlist.video.video_id}`}
+                title="YouTube video player"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+              ></iframe>
+            </div>
           )}
 
           <Box

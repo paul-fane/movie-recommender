@@ -12,12 +12,12 @@ def suggestions_list(user, filters=None) -> QuerySet[Suggestion]:
     filters = filters or {}
     
     category = filters['category']
-    query = None
-    if "query" in filters:
-        query = filters["query"]
+    # query = None
+    # if "query" in filters:
+    #     query = filters["query"]
     
     
-    # Initiali category = "all" => select all
+    # Initial category = "all" => select all
     # Select all Movies and TVShows suggestions for the user
     suggestion_qs = Suggestion.objects.filter(user=user, did_rate=False)
     # Select All Movies and TVShows
@@ -59,6 +59,10 @@ def suggestions_list(user, filters=None) -> QuerySet[Suggestion]:
 
 
 def get_recently_suggested(movie_ids=[], user_ids=[], days_ago=7):
+    '''
+    Get the list of movies that have been suggested to the users in the last days_ago.
+    The function returns a dictionary with the movie_id as key and the list of users as value who have been suggested that movie
+    '''
     data = {}
     delta = datetime.timedelta(days=days_ago)
     time_delta = timezone.now() - delta

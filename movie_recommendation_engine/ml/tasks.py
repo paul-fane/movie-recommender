@@ -34,9 +34,10 @@ def batch_users_prediction_task(users_ids=None, start_page=0, offset=50, max_pag
     # The model get the accuracy using rmse algorithm passing the predictions => model.test(trainset.build_testset())
     model = load_model() # load the lattest mode
     
-    
     # Fetching Movies and Users
     end_page = start_page + offset
+    if max_pages < start_page + offset:
+        end_page = start_page + max_pages
     
     generate_suggestions(model, users_ids, start_page, end_page)
     

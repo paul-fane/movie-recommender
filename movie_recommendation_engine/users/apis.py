@@ -6,11 +6,9 @@ from rest_framework.views import APIView
 from movie_recommendation_engine.api.pagination import LimitOffsetPagination
 from movie_recommendation_engine.api.pagination import get_paginated_response
 from movie_recommendation_engine.users.models import BaseUser
-from movie_recommendation_engine.users.selectors import user_get
-from movie_recommendation_engine.users.selectors import user_list
-from movie_recommendation_engine.users.services import user_create
-from movie_recommendation_engine.users.services import user_update
-
+from movie_recommendation_engine.users.selectors import user_get, user_list, user_get_login_data
+from movie_recommendation_engine.users.services import user_create, user_update
+from movie_recommendation_engine.api.mixins import ApiAuthMixin
 
 class UserDetailApi(APIView):
     class OutputSerializer(serializers.Serializer):
@@ -106,5 +104,12 @@ class UserUpdateApi(APIView):
         # But at the very moment when we need to make a change to the output,
         # that's specific to this API, we'll introduce a separate OutputSerializer just for this API
         data = UserDetailApi.OutputSerializer(user).data
+
+        return Response(data)
+
+
+class UserMeApi(ApiAuthMixin, APIView):
+    def get(self, request):
+        data = user_get_login_data(user=request.user)
 
         return Response(data)

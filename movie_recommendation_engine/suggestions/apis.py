@@ -10,10 +10,9 @@ from movie_recommendation_engine.api.pagination import (
     LimitOffsetPagination,
     get_paginated_response,
 )
+from movie_recommendation_engine.api.mixins import ApiAuthMixin
 
-class SuggestionsListView(APIView):
-    permission_classes = [IsAuthenticated]
-    
+class SuggestionsListView(APIView, ApiAuthMixin):
     class Pagination(LimitOffsetPagination):
         default_limit = 20
         

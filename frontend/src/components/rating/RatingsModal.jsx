@@ -45,26 +45,51 @@ const RatingsModal = ({ ...props }) => {
       url = `http://127.0.0.1:8000/api/ratings/list/${playlist.id}?query=${queryStars}`;
     }
     setLoading(true);
-    try {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + String(props.authTokens.access),
-        },
-      });
-
-      if (response.status === 200) {
-        const data = await response.json();
-        setRatings((prevItems) => [...prevItems, ...data.results]);
-        //setRatings(data.results);
-        setNextPage(data.next);
+    if (props.user){
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + String(props.authTokens.access),
+          },
+        });
+  
+        if (response.status === 200) {
+          const data = await response.json();
+          console.log(data)
+          setRatings((prevItems) => [...prevItems, ...data.results]);
+          //setRatings(data.results);
+          setNextPage(data.next);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
+    } else {
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+  
+        if (response.status === 200) {
+          const data = await response.json();
+          console.log(data)
+          setRatings((prevItems) => [...prevItems, ...data.results]);
+          //setRatings(data.results);
+          setNextPage(data.next);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
     }
+    
   };
 
   const handleQueryChange = (event) => {

@@ -9,7 +9,7 @@ class RateSerializer(serializers.ModelSerializer):
         fields = ['id','username', 'value', 'review_text', 'timestamp']
         
     def get_username(self, obj):
-        return obj.user.username
+        return obj.user.email
     
 
 class RatePlaylistSerializer(serializers.ModelSerializer):
@@ -21,7 +21,7 @@ class RatePlaylistSerializer(serializers.ModelSerializer):
         fields = ['id','username','playlist', 'value', 'review_text', 'timestamp']
         
     def get_username(self, obj):
-        return obj.user.username
+        return obj.user.email
     
     def get_playlist(self, obj):
         # Retrieve the related object using the GenericForeignKey

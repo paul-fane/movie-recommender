@@ -1,6 +1,7 @@
 .qodo
 local-cdn
 data/
+postgres_data/
 
 __pycache__/
 

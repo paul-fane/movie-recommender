@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
@@ -48,26 +48,49 @@ const RatingsProfileModal = ({ ...props }) => {
     }
 
     setLoading(true);
-    try {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + String(props.authTokens.access),
-        },
-      });
-
-      if (response.status === 200) {
-        const data = await response.json();
-        setRatings((prevItems) => [...prevItems, ...data.results]);
-        //setRatings(data.results);
-        setNextPage(data.next);
+    if (props.user){
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + String(props.authTokens.access),
+          },
+        });
+  
+        if (response.status === 200) {
+          const data = await response.json();
+          setRatings((prevItems) => [...prevItems, ...data.results]);
+          //setRatings(data.results);
+          setNextPage(data.next);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
+    } else {
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+  
+        if (response.status === 200) {
+          const data = await response.json();
+          setRatings((prevItems) => [...prevItems, ...data.results]);
+          //setRatings(data.results);
+          setNextPage(data.next);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
     }
+    
   };
 
   const handleQueryChange = (event) => {

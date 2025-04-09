@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from "../context/AuthContext";
 
 import Typography from "@mui/material/Typography";
@@ -315,6 +315,7 @@ const HomePage = () => {
 
       {selectedRatingsItem && (
         <RatingsModal
+          user={user}
           openRatingsModal={openRatingsModal}
           handleCloseRatingsModal={handleCloseRatingsModal}
           playlist={selectedRatingsItem}

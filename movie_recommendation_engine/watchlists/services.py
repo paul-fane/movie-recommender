@@ -3,12 +3,13 @@ from movie_recommendation_engine.playlists.models import MovieProxy, TVShowProxy
 from movie_recommendation_engine.watchlists.models import Watchlist
 
 
-def watchlist_create(data, user):
+def watchlist_create(data, user) -> Watchlist:
     object_id = data['object_id']
     ctype = data['ctype']
     
     content_type = None
     
+    # The type of the object to be added to the watchlist can be a Movie, TV Show, or a Playlist.
     if ctype == Playlist.PlaylistTypeChoices.MOVIE:
         content_type = ContentType.objects.get_for_model(MovieProxy, for_concrete_model=False)
     elif ctype == Playlist.PlaylistTypeChoices.SHOW:

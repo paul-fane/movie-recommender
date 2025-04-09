@@ -2,12 +2,11 @@ from django.conf import settings
 from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-
-User = settings.AUTH_USER_MODEL # "auth.User"
+from movie_recommendation_engine.users.models import BaseUser
 
 
 class Watchlist(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="watchlist")
+    user = models.ForeignKey(BaseUser, on_delete=models.CASCADE, related_name="watchlist")
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")

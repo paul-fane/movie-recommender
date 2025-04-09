@@ -1,10 +1,7 @@
 from django.core.management.base import BaseCommand
-from django.contrib.auth import get_user_model
 
 from movie_recommendation_engine.ratings.models import Rating
 from movie_recommendation_engine.ratings.tasks import generate_fake_reviews
-
-User = get_user_model()
 
 # py manage.py fake_ratings 100 --users 500 --show-total
 

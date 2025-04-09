@@ -28,7 +28,6 @@ const ProfilePage = () => {
   const [userRatingsCount, setUserRatingsCount] = useState(null);
   const [ownRecommendations, setOwnRecommendations] = useState([]);
   const [ownWatchlist, setOwnWatchlist] = useState([]);
-  const [ownPlaylists, setOwnPlaylists] = useState([]);
   const [ratingsCompar, setRatingsCompar] = useState([]);
 
   const [loading, setLoading] = useState(false);
@@ -43,7 +42,7 @@ const ProfilePage = () => {
 
   let getProfilePage = async (url) => {
     if (!url) {
-      url = `http://127.0.0.1:8000/api/profile/${params.username}/`;
+      url = `http://127.0.0.1:8000/api/profiles/profile/${params.username}/`;
     }
     if (user) {
       setLoading(true);
@@ -64,7 +63,6 @@ const ProfilePage = () => {
           setUserRatingsCount(data.user_ratings_count);
           setOwnRecommendations(data.own_recommendations);
           setOwnWatchlist(data.own_watchlist);
-          setOwnPlaylists(data.own_playlists);
           setRatingsCompar(data.ratings_compar);
         }
       } catch (error) {
@@ -133,7 +131,7 @@ const ProfilePage = () => {
                   <Grid key={rating.id} size={{ xs: 12, md: 2 }}>
                     <ReviewCard
                       colorStar={
-                        user && user.username === profileUsername
+                        user && user.email === profileUsername
                           ? "blue"
                           : "green"
                       }
@@ -154,12 +152,12 @@ const ProfilePage = () => {
           </>
         ) : (
           <Typography gutterBottom variant="h6" component="div">
-            {user && user.username !== profileUsername
+            {user && user.email !== profileUsername
               ? "Loved or hated a movie or TV show? Write a review and share it with others!"
               : "No review yet!"}
           </Typography>
         )}
-        {user && user.username !== profileUsername && (
+        {user && user.email !== profileUsername && (
           <>
             <Typography variant="h6" color="info" gutterBottom>
               Compared to You
@@ -206,7 +204,7 @@ const ProfilePage = () => {
         )}
       </Box>
 
-      {user && user.username === profileUsername && (
+      {user && user.email === profileUsername && (
         <>
           <Box
             sx={{
@@ -293,20 +291,6 @@ const ProfilePage = () => {
                 No suggestions yet! Start rating movies to get new suggestions!
               </Typography>
             )}
-          </Box>
-          <Box
-            sx={{
-              borderRadius: "12px",
-              border: "1px solid",
-              p: 2,
-              borderColor: "#E8E8E8",
-            }}
-          >
-            <Typography variant="h6" color="info" gutterBottom>
-              Your Playlists
-            </Typography>
-
-            <Typography>{ownPlaylists}</Typography>
           </Box>
         </>
       )}

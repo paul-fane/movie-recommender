@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import  { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from "../context/AuthContext";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -18,11 +18,11 @@ const WatchlistPage = () => {
 
   const [playlists, setPlaylists] = useState([]);
 
-  const [querySearch, setQuerySearch] = useState({
-    query: "",
-    sort_by: "popular",
-    category: "all",
-  });
+  // const [querySearch, setQuerySearch] = useState({
+  //   query: "",
+  //   sort_by: "popular",
+  //   category: "all",
+  // });
 
   const handleOpenRatingsModal = useCallback((item) => {
     setSelectedRatingsItem(item);
@@ -46,7 +46,7 @@ const WatchlistPage = () => {
 
   useEffect(() => {
     getPlaylists();
-  }, [querySearch, user]);
+  }, [user]);
 
   let getPlaylists = async () => {
     const response = await fetch(

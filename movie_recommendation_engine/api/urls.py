@@ -9,4 +9,5 @@ urlpatterns = [
     path("playlists/", include(("movie_recommendation_engine.playlists.urls", "playlists"))),
     path("dashboard/", include(("movie_recommendation_engine.dashboard.urls", "dashboard"))),
     path("watchlists/", include(("movie_recommendation_engine.watchlists.urls", "watchlists"))),
+    path("profiles/", include(("movie_recommendation_engine.profiles.urls", "profiles"))),
 ]

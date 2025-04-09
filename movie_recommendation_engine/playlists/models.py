@@ -7,9 +7,7 @@ import datetime
 from django.utils.text import slugify
 # Create your models here.
 from movie_recommendation_engine.common.models import PublishStateOptions
-from movie_recommendation_engine.common.receivers import unique_slugify_pre_save
-from movie_recommendation_engine.playlists.receivers import publish_state_pre_save
-
+from movie_recommendation_engine.common.receivers import unique_slugify_pre_save, publish_state_pre_save
 from movie_recommendation_engine.categories.models import Category
 from movie_recommendation_engine.ratings.models import Rating
 from movie_recommendation_engine.tags.models import TaggedItem

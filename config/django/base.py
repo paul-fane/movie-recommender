@@ -49,6 +49,7 @@ LOCAL_APPS = [
     "movie_recommendation_engine.ml",
     "movie_recommendation_engine.exports",
     "movie_recommendation_engine.dashboard",
+    "movie_recommendation_engine.profiles",
 ]
 
 THIRD_PARTY_APPS = [
@@ -110,12 +111,33 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, "db.sqlite3"),
-    }
+    "default": env.db("DATABASE_URL", default="postgres:///movie_recommendation_engine"),
 }
+
+if os.environ.get("GITHUB_WORKFLOW"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "github_actions",
+            "USER": "postgres",
+            "PASSWORD": "postgres",
+            "HOST": "127.0.0.1",
+            "PORT": "5432",
+        }
+    }
+DATABASES["default"]["ATOMIC_REQUESTS"] = True
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, "db.sqlite3"),
+#         # 'OPTIONS': {
+#         #     'timeout': 50,  # Increase timeout for heavy queries
+#         # }
+#     }
+# }
 
 
 # Password validation
@@ -161,7 +183,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        #'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     # "EXCEPTION_HANDLER": "movie_recommendation_engine.api.exception_handlers.drf_default_with_modifications_exception_handler",
     'EXCEPTION_HANDLER': 'movie_recommendation_engine.api.exception_handlers.hacksoft_proposed_exception_handler',
@@ -183,6 +205,7 @@ from config.settings.cors import *  # noqa
 from config.settings.debug_toolbar.settings import *  # noqa
 from config.settings.debug_toolbar.setup import DebugToolbarSetup  # noqa
 from config.settings.files_and_storages import *  # noqa
+from config.settings.simple_jwt import * # noqa
 
 INSTALLED_APPS, MIDDLEWARE = DebugToolbarSetup.do_settings(INSTALLED_APPS, MIDDLEWARE)
 

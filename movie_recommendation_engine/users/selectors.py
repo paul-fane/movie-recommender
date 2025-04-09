@@ -38,7 +38,7 @@ def get_recent_users(days_ago=7, ids_only=True) -> QuerySet[BaseUser]:
     delta = datetime.timedelta(days=days_ago)
     time_delta = timezone.now()  - delta
     qs = BaseUser.objects.filter(
-        Q(date_joined__gte=time_delta) |
+        Q(created_at__gte=time_delta) |
         Q(last_login__gte=time_delta) 
     )
     if ids_only:

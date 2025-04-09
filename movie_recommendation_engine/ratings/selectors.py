@@ -6,7 +6,8 @@ from django.contrib.contenttypes.models import ContentType
 from movie_recommendation_engine.playlists.models import MovieProxy
 from django.db.models import F
 
-def ratings_list(playlist_id=None, user_username=None, filters=None):
+def ratings_list(playlist_id=None, user_username=None, filters=None) -> QuerySet[Rating]:
+    '''Retrive ratings for a specific playlist or user.'''
     filters = filters or {}
     
     query = filters['query']
@@ -15,7 +16,7 @@ def ratings_list(playlist_id=None, user_username=None, filters=None):
     if playlist_id:
         qs = Rating.objects.filter(object_id=playlist_id, active=True)
     elif user_username:
-        user = BaseUser.objects.get(username=user_username)
+        user = BaseUser.objects.get(email=user_username)
         qs = Rating.objects.filter(user=user, active=True)
         
     if query != "see_all":
@@ -23,12 +24,13 @@ def ratings_list(playlist_id=None, user_username=None, filters=None):
         
     return qs
 
-def compar_ratings_list(user, user_username, filters=None):
+def compar_ratings_list(user, user_username, filters=None) -> QuerySet[Rating]:
+    '''Retrives ratings from a specific user and compares them with the current user ratings.'''
     filters = filters or {}
     
     query = filters['query']
     
-    profile_user = BaseUser.objects.get(username=user_username)
+    profile_user = BaseUser.objects.get(email=user_username)
     
     own_ratings = Rating.objects.filter(user=user, active=True).values_list('object_id', flat=True)
     ratings_compar = Rating.objects.filter(user=profile_user, active=True).exclude(object_id__in=own_ratings).order_by("-value")

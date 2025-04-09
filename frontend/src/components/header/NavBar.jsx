@@ -153,12 +153,12 @@ export default function AppAppBar() {
             {user ? (
               <>
                 <Button
-                  onClick={() => history(`/user/${user.username}`)}
+                  onClick={() => history(`/user/${user.email}`)}
                   color="primary"
                   variant="text"
                   size="small"
                 >
-                  {user.username}
+                  {user.email}
                 </Button>
                 <Button
                   onClick={logoutUser}
@@ -234,12 +234,12 @@ export default function AppAppBar() {
                   <>
                     <MenuItem>
                       <Button
-                        onClick={() => history(`/user/${user.username}`)}
+                        onClick={() => history(`/user/${user.email}`)}
                         color="primary"
                         variant="outlined"
                         fullWidth
                       >
-                        {user.username}
+                        {user.email}
                       </Button>
                     </MenuItem>
                     <MenuItem>

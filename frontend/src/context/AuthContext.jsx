@@ -1,11 +1,13 @@
 import { createContext, useState, useEffect } from "react";
 // import jwt_decode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+// import PropTypes from "prop-types";
 
 const AuthContext = createContext();
 
 export default AuthContext;
 
+// eslint-disable-next-line react/prop-types
 export const AuthProvider = ({ children }) => {
   // If there are tokens in local storage set it
   let [authTokens, setAuthTokens] = useState(() =>
@@ -23,7 +25,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     let getUser = async () => {
-      let response = await fetch("http://127.0.0.1:8000/api/users/getUser/", {
+      let response = await fetch("http://127.0.0.1:8000/api/users/me/", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -31,6 +33,7 @@ export const AuthProvider = ({ children }) => {
         },
       });
       let data = await response.json();
+      
       if (user !== data){
         setUser(data);
       }
@@ -41,7 +44,7 @@ export const AuthProvider = ({ children }) => {
       getUser();
     }
     
-  }, [authTokens]);
+  }, [authTokens, loading]);
 
   
 
@@ -114,3 +117,8 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+
+// AuthProvider.propTypes = {
+//   children: PropTypes.node.isRequired, // or PropTypes.node (if it's optional)
+// };

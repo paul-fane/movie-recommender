@@ -5,7 +5,8 @@ from movie_recommendation_engine.playlists.models import Playlist, MovieProxy, T
 from movie_recommendation_engine.ratings.models import Rating
 from movie_recommendation_engine.watchlists.models import Watchlist
 from django.db.models.query import QuerySet
-from django.db.models import F
+from django.db.models import F, Case, When
+
 # def dashboard_movie_list(user, filters=None):
 #     '''
 #     "popular": "popular",
@@ -82,9 +83,13 @@ def dashboard_movie_list(user, filters=None):
     # Optimize sorting
     if sort_by:
         if sort_by == 'popular':
-            qs = qs.popular()
+            qs = qs.popular().exclude(score=None)
         elif sort_by == 'unpopular':
-            qs = qs.popular(reverse=True)
+            qs = qs.popular(reverse=True).exclude(score=None)
+        elif sort_by == "release_date" or sort_by == "-release_date":
+            qs = qs.order_by(sort_by).exclude(release_date=None)
+        elif sort_by == "rating_avg" or sort_by == "-rating_avg":
+            qs = qs.order_by(sort_by).exclude(rating_avg=None)
         else:
             qs = qs.order_by(sort_by)
 
@@ -103,9 +108,26 @@ def dashboard_movie_list(user, filters=None):
             user_rate=Subquery(user_ratings_subquery),
             in_watchlist=Exists(watchlist_exists)
         )
+        
+    # if user.is_authenticated:
+    #     qs = qs.annotate(
+    #         user_rate=Subquery(Rating.objects.filter(user=user, object_id=OuterRef('pk'), active=True).values('value')),
+    #         in_watchlist=Exists(Watchlist.objects.filter(user=user, object_id=OuterRef('pk')))
+    #         )
 
     return qs
 
+
+
+def playlist_list_by_id_order(ids: list[int]) -> QuerySet[Playlist]:
+    '''Retrieves playlists by their IDs in the order specified by watchlist_ids'''
+    
+    # Select the playlists that are in the watchlist
+    qs = Playlist.objects.filter(pk__in=ids)
+    
+    # Annotate the queryset with the order of the IDs
+    maintain_order = Case(*[When(pk=pki, then=idx) for idx, pki in enumerate(ids)])
+    return qs.order_by(maintain_order)
 
 
 def movies_dataset() -> QuerySet[MovieProxy]:

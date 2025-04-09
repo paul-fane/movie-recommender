@@ -4,22 +4,20 @@ import datetime
 import decimal 
 from celery import shared_task
 from django.db.models import Avg, Count
-from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-
+from faker import Faker
 
 from movie_recommendation_engine.playlists.models import MovieProxy, Playlist
 from movie_recommendation_engine.ratings.models import Rating, RatingChoices
-
-User= get_user_model()
+from movie_recommendation_engine.users.models import BaseUser
 
 @shared_task(name='generate_fake_reviews')
 def generate_fake_reviews(count=100, users=10, null_avg=False):
-    user_s = User.objects.first() # 1
-    user_e = User.objects.last()
+    user_s = BaseUser.objects.first() # 1
+    user_e = BaseUser.objects.last()
     random_user_ids = random.sample(range(user_s.id, user_e.id), users)
-    users = User.objects.filter(id__in=random_user_ids)
+    users = BaseUser.objects.filter(id__in=random_user_ids)
     movies = MovieProxy.objects.all().order_by("?")[:count]
     # movie_ctype = ContentType.objects.get_for_model(MovieProxy, for_concrete_model=False)
     if null_avg:
@@ -35,7 +33,8 @@ def generate_fake_reviews(count=100, users=10, null_avg=False):
             # content_type=movie_ctype,
             # object_id=movie.id,
             value=user_ratings.pop(),
-            user=random.choice(users)
+            user=random.choice(users),
+            review_text=Faker().text(max_nb_chars=80),
         )
         new_ratings.append(rating_obj.id)
     return new_ratings
@@ -56,21 +55,26 @@ def task_update_movie_ratings(object_id=None):
     # Groups records by object_id
     # For each group (each distinct object_id), it calculates the average of the value field.
     # It also counts how many times each object_id appears in the queryset.
-    agg_ratings = rating_qs.values('object_id').annotate(average=Avg('value'), count=Count('object_id'))
+    agg_ratings = rating_qs.values('object_id').annotate(average=Avg('value'), count=Count('object_id')) # [{'object_id':1, 'avarage':4.5, 'count':2}, ...]
     
     for agg_rate in agg_ratings:
         object_id = agg_rate['object_id']
         rating_avg = agg_rate['average']
         rating_count = agg_rate['count']
+        
+        # Calculate the score based on the average rating and count
         score = decimal.Decimal(rating_avg * rating_count * 1.0)
+        
+        # Update the Movie with the new rating information
         qs = MovieProxy.objects.filter(id=object_id)
-        #qs = Playlist.objects.filter(id=object_id)
         qs.update(
             rating_avg=rating_avg,
             rating_count=rating_count,
             score=score,
             rating_last_updated=timezone.now()
         )
+        
+    # Calculate the total time taken for the task
     total_time = time.time() - start_time
     delta = datetime.timedelta(seconds=int(total_time))
     print(f"Rating update took {delta} ({total_time}s)")
@@ -81,7 +85,6 @@ def task_update_playlists_ratings(object_id=None):
     start_time = time.time()
     
     # for_concrete_model=False allows fetching the ContentType of a proxy model
-    #ctype = ContentType.objects.get_for_model(MovieProxy, for_concrete_model=False)
     rating_qs = Rating.objects.filter(active=True)
     
     if object_id is not None:
@@ -90,13 +93,17 @@ def task_update_playlists_ratings(object_id=None):
     # Groups records by object_id
     # For each group (each distinct object_id), it calculates the average of the value field.
     # It also counts how many times each object_id appears in the queryset.
-    agg_ratings = rating_qs.values('object_id').annotate(average=Avg('value'), count=Count('object_id'))
+    agg_ratings = rating_qs.values('object_id').annotate(average=Avg('value'), count=Count('object_id')) # [{'object_id':1, 'avarage':4.5, 'count':2}, ...]
     
     for agg_rate in agg_ratings:
         object_id = agg_rate['object_id']
         rating_avg = agg_rate['average']
         rating_count = agg_rate['count']
+        
+        # Calculate the score based on the average rating and count
         score = decimal.Decimal(rating_avg * rating_count * 1.0)
+        
+        # Update the Playlist with the new rating information
         qs = Playlist.objects.filter(id=object_id)
         qs.update(
             rating_avg=rating_avg,
@@ -104,6 +111,8 @@ def task_update_playlists_ratings(object_id=None):
             score=score,
             rating_last_updated=timezone.now()
         )
+        
+    # Calculate the total time taken for the task
     total_time = time.time() - start_time
     delta = datetime.timedelta(seconds=int(total_time))
     print(f"Rating update took {delta} ({total_time}s)")

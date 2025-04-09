@@ -1,7 +1,6 @@
 from rest_framework.response import Response
 from movie_recommendation_engine.watchlists.models import Watchlist
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from movie_recommendation_engine.playlists.serializers import PlaylistSerializer
 from movie_recommendation_engine.api.pagination import (
     LimitOffsetPagination,
@@ -11,10 +10,10 @@ from rest_framework import serializers, status
 from django.shortcuts import get_object_or_404
 from movie_recommendation_engine.watchlists.services import watchlist_create
 from movie_recommendation_engine.watchlists.selectors import watchlist_list
+from movie_recommendation_engine.api.mixins import ApiAuthMixin
 
 
-class WatchlistListView(APIView):
-    permission_classes = [IsAuthenticated]
+class WatchlistListView(APIView, ApiAuthMixin):
     
     class Pagination(LimitOffsetPagination):
         default_limit = 50
@@ -31,8 +30,7 @@ class WatchlistListView(APIView):
             view=self,
         )
         
-class WatchlistCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+class WatchlistCreateView(APIView, ApiAuthMixin):
         
     class InputSerializer(serializers.Serializer):
         object_id = serializers.IntegerField()
@@ -46,13 +44,11 @@ class WatchlistCreateView(APIView):
         return Response(status=status.HTTP_201_CREATED)
         
         
-class WatchlistDeleteView(APIView):
-    permission_classes = [IsAuthenticated]
+class WatchlistDeleteView(APIView, ApiAuthMixin):
 
     def delete(self, request, pk, *args, **kwargs):
-        # Fetch the movie instance or return 404 if not found
         watchlist = get_object_or_404(Watchlist, object_id=pk, user=request.user)
-        #watchlist = Watchlist.objects.get(user=request.user, object_id=pk)
+        
         # Delete the instance
         watchlist.delete()
         

@@ -66,7 +66,7 @@ export default function SignIn(props) {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState("");
-  const [open, setOpen] = React.useState(false);
+  // const [open, setOpen] = React.useState(false);
 
   const [alertMessage, setAlertMessage] = useState(null);
   const history = useNavigate();
@@ -74,7 +74,7 @@ export default function SignIn(props) {
   const { loginUser } = useContext(AuthContext);
 
   const login = async (user) => {
-    const response = await fetch("http://127.0.0.1:8000/api/token/", {
+    const response = await fetch("http://127.0.0.1:8000/api/auth/token/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -101,7 +101,7 @@ export default function SignIn(props) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const user = {
-      username: data.get("username"),
+      email: data.get("email"),
       password: data.get("password"),
     };
 
@@ -109,7 +109,7 @@ export default function SignIn(props) {
   };
 
   const validateInputs = () => {
-    const username = document.getElementById("username");
+    const email = document.getElementById("email");
     const password = document.getElementById("password");
 
     let isValid = true;
@@ -123,9 +123,9 @@ export default function SignIn(props) {
     //   setEmailErrorMessage('');
     // }
 
-    if (!username.value || username.value.length < 1) {
+    if (!email.value || email.value.length < 1) {
       setNameError(true);
-      setNameErrorMessage("Username is required.");
+      setNameErrorMessage("Email is required.");
       isValid = false;
     } else {
       setNameError(false);
@@ -172,14 +172,14 @@ export default function SignIn(props) {
             }}
           >
             <FormControl>
-              <FormLabel htmlFor="email">Enter Username</FormLabel>
+              <FormLabel htmlFor="email">Enter Email</FormLabel>
               <TextField
                 error={nameError}
                 helperText={nameErrorMessage}
-                id="username"
+                id="email"
                 type="text"
-                name="username"
-                placeholder="Username"
+                name="email"
+                placeholder="Email"
                 autoFocus
                 required
                 fullWidth

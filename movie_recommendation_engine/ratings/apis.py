@@ -1,7 +1,5 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-
 from rest_framework import serializers, status
 from movie_recommendation_engine.ratings.services import rating_create
 from movie_recommendation_engine.ratings.selectors import ratings_list, compar_ratings_list
@@ -10,10 +8,9 @@ from movie_recommendation_engine.api.pagination import (
     LimitOffsetPagination,
     get_paginated_response,
 )
+from movie_recommendation_engine.api.mixins import ApiAuthMixin
 
-class RateCreateView(APIView):
-    permission_classes = [IsAuthenticated]
-        
+class RateCreateView(APIView, ApiAuthMixin):
     class FilterSerializer(serializers.Serializer):
         object_id = serializers.IntegerField()
         rating_value = serializers.IntegerField()
@@ -24,7 +21,7 @@ class RateCreateView(APIView):
         serializer = self.FilterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
-        rating_create(data=serializer.validated_data, user=request.user, request=request)
+        rating_create(data=serializer.validated_data, user=request.user)
         return Response(status=status.HTTP_201_CREATED)
     
 
@@ -42,13 +39,13 @@ class RateListBaseView(APIView):
         filters_serializer.is_valid(raise_exception=True)
 
         # Determine which parameter is provided
-        playlist_id = kwargs.get('playlist_id')
+        playlist_id = kwargs.get('playlist_id') 
         user_username = kwargs.get('user_username')
 
-        if playlist_id:
+        if playlist_id: # Returns ratings for a specific playlist
             ratings = ratings_list(playlist_id=playlist_id, filters=filters_serializer.validated_data)
             serializer_class = RateSerializer
-        elif user_username:
+        elif user_username: # Returns ratings for a specific user
             ratings = ratings_list(user_username=user_username, filters=filters_serializer.validated_data)
             serializer_class = RatePlaylistSerializer
         else:
@@ -63,7 +60,7 @@ class RateListBaseView(APIView):
         )
         
         
-class CompareRateListView(APIView):
+class CompareRateListView(APIView, ApiAuthMixin):
     class Pagination(LimitOffsetPagination):
         default_limit = 20
         

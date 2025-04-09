@@ -1,26 +1,39 @@
 version: '3'
 
 services:
+  db:
+    image: postgres:14.1
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=movie_recommendation_engine_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    container_name: postgres
+
+      
   django:
     build:
       dockerfile: docker/local.Dockerfile
       context: .
-    container_name: django
+    container_name: django-backend
     command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/movie_recommendation_engine_db
     volumes:
       - .:/app
     ports:
       - "8000:8000"
     depends_on:
+      - db
       - redis
-      - celery
     #restart: on-failure
 
   react:
     build:
       dockerfile: local.Dockerfile
       context: ./frontend
-    container_name: react-app
+    container_name: react
     volumes:
       - /app/node_modules
       - ./frontend:/app
@@ -31,6 +44,7 @@ services:
     image: "redis:alpine"
     ports:
       - 6379:6379
+    container_name: redis
 
   celery:
     build:
@@ -38,7 +52,11 @@ services:
       context: .
     container_name: celery
     command: celery -A movie_recommendation_engine.tasks worker --loglevel=info
+    #command: celery -A movie_recommendation_engine.tasks worker -l info --without-gossip --without-mingle --without-heartbeat
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/movie_recommendation_engine_db
     depends_on:
+      - db
       - redis
     volumes:
       - .:/app
@@ -48,10 +66,17 @@ services:
     build:
       dockerfile: docker/local.Dockerfile
       context: .
-    container_name: beat
+    container_name: beats
     command: celery -A movie_recommendation_engine.tasks beat --loglevel=info
+    #command: celery -A movie_recommendation_engine.tasks beat  -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/movie_recommendation_engine_db
     depends_on:
+      - db
       - redis
     volumes:
       - .:/app
     #restart: on-failure
+
+# volumes:
+#   postgres_data:

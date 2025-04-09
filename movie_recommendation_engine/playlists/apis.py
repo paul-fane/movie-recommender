@@ -12,6 +12,8 @@ class MovieDetailView(APIView):
     
     def get(self, request, slug, *args, **kwargs):
         movie = MovieProxy.objects.filter(slug=slug)
+        print(slug)
+        print(movie)
         user = request.user
         
         if user.is_authenticated:

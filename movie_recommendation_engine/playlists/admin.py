@@ -7,9 +7,9 @@ from movie_recommendation_engine.playlists.models import MovieProxy, TVShowProxy
 
 class MovieProxyAdmin(admin.ModelAdmin):
     inlines = [TaggedItemInline]
-    list_display = ['__str__', 'idx', 'rating_avg', 'rating_count']
+    list_display = ['__str__', 'idx', 'rating_avg', 'rating_count', 'score']
     fields = ['title', 'overview', 'state', 'category', 'video', 'slug']
-    readonly_fields = ['idx', 'rating_avg', 'rating_count']
+    readonly_fields = ['idx', 'rating_avg', 'rating_count', 'score']
     search_fields = ['id']
     class Meta:
         model = MovieProxy

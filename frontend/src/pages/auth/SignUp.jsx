@@ -58,24 +58,24 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignUp(props) {
-  //   const [emailError, setEmailError] = React.useState(false);
-  //   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
+  const [emailError, setEmailError] = React.useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [re_passwordError, setRePasswordError] = React.useState(false);
   const [re_passwordErrorMessage, setRePasswordErrorMessage] =
     React.useState("");
-  const [nameError, setNameError] = React.useState(false);
-  const [nameErrorMessage, setNameErrorMessage] = React.useState("");
+  // const [nameError, setNameError] = React.useState(false);
+  // const [nameErrorMessage, setNameErrorMessage] = React.useState("");
 
   let [alertMessage, setAlertMessage] = useState(null);
   const history = useNavigate();
 
   const validateInputs = () => {
-    // const email = document.getElementById("email");
+    const email = document.getElementById("email");
     const password = document.getElementById("password");
     const re_password = document.getElementById("re_password");
-    const username = document.getElementById("username");
+    // const username = document.getElementById("username");
 
     let isValid = true;
 
@@ -115,20 +115,20 @@ export default function SignUp(props) {
       setRePasswordErrorMessage("");
     }
 
-    if (!username.value || username.value.length < 1) {
-      setNameError(true);
-      setNameErrorMessage("Username is required.");
+    if (!email.value || email.value.length < 1) {
+      setEmailError(true);
+      setEmailErrorMessage("Email is required.");
       isValid = false;
     } else {
-      setNameError(false);
-      setNameErrorMessage("");
+      setEmailError(false);
+      setEmailErrorMessage("");
     }
 
     return isValid;
   };
 
   let registerUser = async (user) => {
-    const response = await fetch("http://127.0.0.1:8000/api/register/", {
+    const response = await fetch("http://127.0.0.1:8000/api/users/create/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -144,9 +144,9 @@ export default function SignUp(props) {
       //     variant: "warning",
       //   });
       // }
-      if (data.username) {
+      if (data.email) {
         setAlertMessage({
-          message: "Username: " + data.username,
+          message: "Email: " + data.email,
           variant: "warning",
         });
       }
@@ -177,7 +177,7 @@ export default function SignUp(props) {
   };
 
   const handleSubmit = (event) => {
-    if (nameError || re_passwordError || passwordError) {
+    if (emailError || re_passwordError || passwordError) {
       event.preventDefault();
       return;
     }
@@ -189,9 +189,8 @@ export default function SignUp(props) {
     //   re_password: user_data.get("re_password"),
     // });
     const user = {
-      username: user_data.get("username"),
+      email: user_data.get("email"),
       password: user_data.get("password"),
-      re_password: user_data.get("re_password"),
     };
 
     registerUser(user);
@@ -218,16 +217,16 @@ export default function SignUp(props) {
             sx={{ display: "flex", flexDirection: "column", gap: 2 }}
           >
             <FormControl>
-              <FormLabel htmlFor="name">Enter Username</FormLabel>
+              <FormLabel htmlFor="name">Enter Email</FormLabel>
               <TextField
-                name="username"
+                name="email"
                 required
                 fullWidth
-                id="username"
-                placeholder="Username"
-                error={nameError}
-                helperText={nameErrorMessage}
-                color={nameError ? "error" : "primary"}
+                id="email"
+                placeholder="Email"
+                error={emailError}
+                helperText={emailErrorMessage}
+                color={emailError ? "error" : "primary"}
               />
             </FormControl>
             {/* <FormControl>
