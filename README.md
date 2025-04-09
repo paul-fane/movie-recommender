@@ -56,8 +56,8 @@ A full-stack, web-based platform for discovering, rating, and reviewing movies, 
 
 ### 2. Clone the Repo
 ```bash
-   git clone https://github.com/paul-fane/movie_recommendation_engine.git
-   cd movie_recommendation_engine
+   git clone https://github.com/paul-fane/movie-recommender.git
+   cd movie-recommender
 ```
    
 ### 3. Docker Setup:  
