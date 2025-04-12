@@ -74,6 +74,7 @@ export default function SignIn(props) {
   const { loginUser } = useContext(AuthContext);
 
   const login = async (user) => {
+    setAlertMessage(null)
     const response = await fetch("http://127.0.0.1:8000/api/auth/token/", {
       method: "POST",
       headers: {
@@ -82,12 +83,11 @@ export default function SignIn(props) {
       body: JSON.stringify(user),
     });
     let data = await response.json();
-    //console.log(data)
     if (response.status === 200) {
       loginUser(data)
     } else {
       setAlertMessage({
-        message: "Something went wrong!",
+        message: data.message,
         variant: "warning",
       });
     }

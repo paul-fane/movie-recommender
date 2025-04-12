@@ -128,6 +128,7 @@ export default function SignUp(props) {
   };
 
   let registerUser = async (user) => {
+    setAlertMessage(null)
     const response = await fetch("http://127.0.0.1:8000/api/users/create/", {
       method: "POST",
       headers: {
@@ -136,43 +137,30 @@ export default function SignUp(props) {
       body: JSON.stringify(user),
     });
     const data = await response.json();
-    console.log(data);
+    
     if (response.status === 400) {
-      // if (data.email) {
-      //   setAlertMessageEmail({
-      //     message: "Email: " + data.email,
-      //     variant: "warning",
-      //   });
-      // }
-      if (data.email) {
-        setAlertMessage({
-          message: "Email: " + data.email,
-          variant: "warning",
-        });
+      if (data.extra?.fields) {
+        const fieldErrors = data.extra.fields
+        const generateAlerts = []
+
+        for (const [field, messages] of Object.entries(fieldErrors)){
+          messages.forEach((msg) => {
+            generateAlerts.push({
+              message: `${field}: ${msg}`,
+              variant: 'warning',
+            })
+          })
+        }
+
+        setAlertMessage(generateAlerts)
       }
-      if (data.password) {
-        setAlertMessage({
-          message: "Password: " + data.password,
-          variant: "warning",
-        });
-      }
-      if (data.re_password) {
-        setAlertMessage({
-          message: "Confirm Password: " + data.re_password,
-          variant: "warning",
-        });
-      }
-      if (data.non_field_errors) {
-        setAlertMessage({
-          message: data.non_field_errors,
-          variant: "warning",
-        });
-      }
+
+      
     } else if (response.status === 200 || response.status === 201) {
-      setAlertMessage({
+      setAlertMessage([{
         message: data.message,
         variant: "success",
-      });
+      }]);
     }
   };
 
@@ -198,9 +186,16 @@ export default function SignUp(props) {
 
   return (
     <AppTheme {...props}>
+
       {alertMessage !== null && (
-        <Alert severity={alertMessage.variant}>{alertMessage.message}</Alert>
+        alertMessage.map((alert, index) => (
+          <Alert severity={alert.variant} key={index}>{alert.message}</Alert>
+        ))
       )}
+
+      {/* {alertMessage !== null && (
+        <Alert severity={alertMessage.variant}>{alertMessage.message}</Alert>
+      )} */}
       <CssBaseline enableColorScheme />
       <SignUpContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
